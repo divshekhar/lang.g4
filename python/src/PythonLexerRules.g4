@@ -1,6 +1,6 @@
 lexer grammar PythonLexerRules;
 
-// INDENT and DEDENT tokens
+// INDENT
 INDENT: '\t' | '    ';
 
 NEWLINE: '\n';

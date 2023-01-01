@@ -5,68 +5,72 @@ import PythonLexerRules;
 package antlr;
 }
 
+tokens {
+	DEDENT
+}
+
 // Python program
 program: (statement)+;
 
 // python statement
 statement:
-	blankStatement
-	| assignment
-	| augmentedAssignment
-	| functionDefinition
-	| classDefinition
-	| expressionStatement
-	| passStatement
-	| delStatement
-	| returnStatement
-	| yieldStatement
-	| raiseStatement
-	| breakStatement
-	| continueStatement
-	| importStatement
-	| globalStatement
-	| nonlocalStatement
-	| assertStatement
-	| ifStatement
-	| whileStatement
-	| forStatement
-	| tryStatement
-	| withStatement
-	| decoratedDefinition
-	| asyncStatement
-	| compoundStatement;
+	blankStat				# blankStatement
+	| assignmentStat		# assignmentStatement
+	| augmentedAssignStat	# augmentedAssignStatement
+	| functionDefStat		# functionDefinition
+	| classDefStat			# classDefinition
+	| expressionStat		# expressionStatement
+	| passStat				# passStatement
+	| delStat				# delStatement
+	| returnStat			# returnStatement
+	| yieldStat				# yieldStatement
+	| raiseStat				# raiseStatement
+	| breakStat				# breakStatement
+	| continueStat			# continueStatement
+	| importStat			# importStatement
+	| globalStat			# globalStatement
+	| nonlocalStat			# nonlocalStatement
+	| assertStat			# assertStatement
+	| ifStat				# ifStatement
+	| whileStat				# whileStatement
+	| forStat				# forStatement
+	| tryStat				# tryStatement
+	| withStat				# withStatement
+	| decoratedDefStat		# decoratedDefinition
+	| asyncStat				# asyncStatement
+	| compoundStat			# compoundStatement;
 
 // Blank statement, example: ;
-blankStatement: NEWLINE;
+blankStat: NEWLINE;
 
 // Import statement, example: import os, sys as system
-importStatement:
+importStat:
 	IMPORT module (AS IDENTIFIER)? (
 		COMMA module (AS IDENTIFIER)?
 	)*;
 module: IDENTIFIER (DOT IDENTIFIER)*;
 
 // Global statement, example: global a, b
-globalStatement: GLOBAL IDENTIFIER (COMMA IDENTIFIER)*;
+globalStat: GLOBAL IDENTIFIER (COMMA IDENTIFIER)*;
 
 // Nonlocal statement, example: nonlocal a, b
-nonlocalStatement: NONLOCAL IDENTIFIER (COMMA IDENTIFIER)*;
+nonlocalStat: NONLOCAL IDENTIFIER (COMMA IDENTIFIER)*;
 
 // Function definition, example: def f(a, b): pass
-functionDefinition:
+functionDefStat:
 	DEF IDENTIFIER LPAREN parameterList? RPAREN COLON suite;
 parameterList: parameter (COMMA parameter)*;
 parameter: IDENTIFIER (ASSIGN expression)?;
 
 // Class definition, example: class C: pass
-classDefinition:
+classDefStat:
 	CLASS IDENTIFIER (LPAREN IDENTIFIER RPAREN)? COLON suite;
 
 // Suite, block of statements
-suite: NEWLINE? (INDENT)*? (statement)+ NEWLINE? NEWLINE?;
+suite: NEWLINE? (INDENT)*? (statement)+ DEDENT NEWLINE?;
 
 // Assignment, example: a = 1
-assignment: IDENTIFIER ASSIGN expression NEWLINE?;
+assignmentStat: IDENTIFIER ASSIGN expression NEWLINE?;
 
 // Augmented operators
 augmentedOperator:
@@ -84,136 +88,134 @@ augmentedOperator:
 	| IDIV_ASSIGN;
 
 // Augmented assignment, example: a += 1
-augmentedAssignment:
+augmentedAssignStat:
 	IDENTIFIER augmentedOperator expression NEWLINE?;
 
 // Expression statement, example: 1 + 1
-expressionStatement: expression NEWLINE?;
+expressionStat: expression NEWLINE?;
 
 // Pass statement, example: pass
-passStatement: PASS NEWLINE?;
+passStat: PASS NEWLINE?;
 
 // Del statement, example: del a
-delStatement: DEL expression NEWLINE?;
+delStat: DEL expression NEWLINE?;
 
 // Return statement, example: return 1
-returnStatement: RETURN expression? NEWLINE?;
+returnStat: RETURN expression? NEWLINE?;
 
 // Yield statement, example: yield 1
-yieldStatement: YIELD expression? NEWLINE?;
+yieldStat: YIELD expression? NEWLINE?;
 
 // Raise statement, example: raise Exception
-raiseStatement: RAISE expression? NEWLINE?;
+raiseStat: RAISE expression? NEWLINE?;
 
 // Break statement, example: break
-breakStatement: BREAK NEWLINE?;
+breakStat: BREAK NEWLINE?;
 
 // Continue statement, example: continue
-continueStatement: CONTINUE NEWLINE?;
+continueStat: CONTINUE NEWLINE?;
 
 // Assert statement, example: assert a == 1
-assertStatement: ASSERT expression (COMMA expression)? NEWLINE?;
+assertStat: ASSERT expression (COMMA expression)? NEWLINE?;
 
 // If statement, example: if a == 1: pass
-ifStatement:
+ifStat:
 	IF expression COLON suite (ELIF expression COLON suite)* (
 		ELSE COLON suite
 	)?;
-elifStatement: ELIF expression COLON suite;
+elifStat: ELIF expression COLON suite;
 
 // While statement, example: while a == 1: pass
-whileStatement:
-	WHILE expression COLON suite (ELSE COLON suite)?;
+whileStat: WHILE expression COLON suite (ELSE COLON suite)?;
 
 // For statement, example: for i in range(10): pass
-forStatement:
+forStat:
 	FOR IDENTIFIER IN expression COLON suite (ELSE COLON suite)?;
 
 // Try statement, example: try: pass except: pass
-tryStatement:
+tryStat:
 	TRY COLON suite (
 		EXCEPT expression? AS IDENTIFIER? COLON suite
 	)* (ELSE COLON suite)? (FINALLY COLON suite)?;
-exceptStatement: EXCEPT expression? AS IDENTIFIER? COLON suite;
+exceptStat: EXCEPT expression? AS IDENTIFIER? COLON suite;
 
 // With statement, example: with open('file.txt') as f: pass
-withStatement: WITH expression AS IDENTIFIER COLON suite;
+withStat: WITH expression AS IDENTIFIER COLON suite;
 
 // Decorated definition, example: @decorator def f(): pass
-decoratedDefinition: AT IDENTIFIER+ functionDefinition;
+decoratedDefStat: AT IDENTIFIER+ functionDefStat;
 
 // Async statement, example: async def f(): pass
-asyncStatement: ASYNC statement;
+asyncStat: ASYNC statement;
 
 // Compound statement, example: { a = 1; b = 2; }
-compoundStatement: LBRACE statement* RBRACE NEWLINE?;
+compoundStat: LBRACE statement* RBRACE NEWLINE?;
 
 // Expression
 expression:
-	// Conditional expression, example: a if b else c
-	expression IF expression ELSE expression
-
-	// Or expression, example: a or b
-	| expression OR expression
-
-	// And expression, example: a and b
-	| expression AND expression
-
-	// Comparison expression, example: a == b
-	| expression comparisonOperator expression
-
-	// Arithmetic expression, example: a + b
-	| expression arithmeticOperator expression
-
-	// Bitwise expression, example: a & b
-	| expression bitwiseOperator expression
-
-	// Shift expression, example: a << b
-	| expression shiftOperator expression
-
-	// Additive expression, example: a + b
-	| expression additiveOperator expression
-
-	// Multiplicative expression, example: a * b
-	| expression multiplicativeOperator expression
+	// Group expression, example: (a)
+	LPAREN expression RPAREN # groupExpression
 
 	// Power expression, example: a ** b
-	| expression POW expression
+	| expression POW expression # powerExpression
 
-	// Attribute expression, example: a.b
-	| expression DOT IDENTIFIER
+	// Multiplicative expression, example: a * b
+	| expression op = multiplicativeOperator expression # multiplicativeExpression
 
-	// Subscript expression, example: a[1]
-	| expression LBRACKET expression RBRACKET
+	// Additive expression, example: a + b
+	| expression op = additiveOperator expression # additiveExpression
 
-	// Slice expression, example: a[1:2]
-	| expression LBRACKET expression? COLON expression? RBRACKET
+	// Shift expression, example: a << b
+	| expression (op = shiftOperator) expression # shiftExpression
+
+	// Comparison expression, example: a == b
+	| expression co = comparisonOperator expression # comparisonExpression
+
+	// Membership expression, example: a < b
+	| expression (op = membershipOperators) expression # relationalExpression
+
+	// Bitwise expression, example: a & b
+	| expression op = bitwiseOperator expression # bitwiseExpression
+
+	// Conditional expression, example: a if b else c
+	| expression IF expression ELSE expression # conditionalExpression
+
+	// Or expression, example: a or b
+	| expression OR expression # orExpression
+
+	// And expression, example: a and b
+	| expression AND expression # andExpression
 
 	// Call expression, example: f(1, 2)
-	| IDENTIFIER LPAREN expressionList? RPAREN
-	| notExpression
-	| unaryExpression
-	| lambdaExpression
-	| primaryExpression;
+	| callExpr # callExpression
+
+	// Attribute expression, example: a.b
+	| expression DOT (IDENTIFIER? | callExpr) # attributeExpression
+
+	// Subscript expression, example: a[1]
+	| expression LBRACKET expression RBRACKET # subscriptExpression
+
+	// Slice expression, example: a[1:2]
+	| expression LBRACKET expression? COLON expression? RBRACKET	# sliceExpression
+	| notExpr														# notExpression
+	| unaryExpr														# unaryExpression
+	| lambdaExpr													# lambdaExpression
+	| primaryExpr													# primaryExpression;
+
+// Call expression, example: f(1, 2)
+callExpr: IDENTIFIER LPAREN expressionList? RPAREN;
 
 // Lambda expression, example: lambda a, b: a + b
-lambdaExpression: LAMBDA parameterList? COLON expression;
+lambdaExpr: LAMBDA parameterList? COLON expression;
 
 // Not expression, example: not a
-notExpression: NOT expression;
+notExpr: NOT expression;
+
+// membership operators, example: a in b, a is b
+membershipOperators: IN | IS;
 
 // Comparison operators
 comparisonOperator: EQ | NE | LT | LE | GT | GE;
-
-// Arithmetic operators
-arithmeticOperator:
-	PLUS
-	| MINUS
-	| TIMES
-	| DIV
-	| MOD
-	| IDIV
-	| POW;
 
 // Bitwise operators
 bitwiseOperator: BIT_AND | BIT_OR | XOR;
@@ -228,13 +230,13 @@ additiveOperator: PLUS | MINUS;
 multiplicativeOperator: TIMES | DIV | MOD | IDIV;
 
 // Unary operators
-unaryOperator: MINUS | PLUS | NOT;
+unaryOperator: op = (MINUS | PLUS | NOT);
 
 // Unary expression, example: -a
-unaryExpression: unaryOperator expression;
+unaryExpr: unaryOperator expression;
 
 // Primary expression
-primaryExpression:
+primaryExpr:
 	identifier
 	| numberLiteral
 	| stringLiteral
