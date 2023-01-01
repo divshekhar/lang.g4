@@ -25,7 +25,3 @@ Global expressions and Import statements.
 ### Test Expression
 
 ![Python Expression Statement Test](./img/testExpr.png)
-
-## Contributing
-
-

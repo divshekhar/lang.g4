@@ -28,7 +28,7 @@ All types of contributions are encouraged and valued. See the [Table of Contents
 ## Code of Conduct
 
 This project and everyone participating in it is governed by the
-[lang.g4 Code of Conduct](https://github.com/divshekhar/lang.g4blob/master/CODE_OF_CONDUCT.md).
+[lang.g4 Code of Conduct](https://github.com/divshekhar/lang.g4/blob/master/CODE_OF_CONDUCT.md).
 By participating, you are expected to uphold this code. Please report unacceptable behavior
 to <>.
 
