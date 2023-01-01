@@ -154,7 +154,7 @@ compoundStat: LBRACE statement* RBRACE NEWLINE?;
 // Expression
 expression:
 	// Group expression, example: (a)
-	LPAREN expression RPAREN # groupExpression
+	groupExpr # groupExpression
 
 	// Power expression, example: a ** b
 	| expression POW expression # powerExpression
@@ -190,7 +190,7 @@ expression:
 	| callExpr # callExpression
 
 	// Attribute expression, example: a.b
-	| expression DOT (IDENTIFIER? | callExpr) # attributeExpression
+	| expression DOT (IDENTIFIER | callExpr) # attributeExpression
 
 	// Subscript expression, example: a[1]
 	| expression LBRACKET expression RBRACKET # subscriptExpression
@@ -201,6 +201,9 @@ expression:
 	| unaryExpr														# unaryExpression
 	| lambdaExpr													# lambdaExpression
 	| primaryExpr													# primaryExpression;
+
+// Grouped Expression, example: (a)
+groupExpr: LPAREN expression RPAREN;
 
 // Call expression, example: f(1, 2)
 callExpr: IDENTIFIER LPAREN expressionList? RPAREN;
